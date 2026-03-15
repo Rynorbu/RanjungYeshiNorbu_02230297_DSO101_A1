@@ -2,11 +2,9 @@ services:
   # PostgreSQL Database
   - type: pserv
     name: todo-db
-    env: docker
     plan: free
     region: oregon
-    databaseName: todo_db
-    databaseUser: todo_user
+    postgresVersion: "15"
 
   # Backend Service
   - type: web
