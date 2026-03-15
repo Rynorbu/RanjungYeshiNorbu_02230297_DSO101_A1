@@ -4,7 +4,6 @@ services:
     name: todo-db
     plan: free
     region: oregon
-    postgresVersion: "15"
 
   # Backend Service
   - type: web
