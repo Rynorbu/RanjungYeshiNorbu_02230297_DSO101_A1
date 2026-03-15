@@ -4,7 +4,6 @@ services:
     name: todo-db
     plan: free
     region: oregon
-    database: todo_db
 
   # Backend Service
   - type: web
