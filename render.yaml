@@ -28,7 +28,6 @@ services:
     name: fe-todo
     env: docker
     dockerfilePath: frontend/Dockerfile
-    buildCommand: npm run build
     region: oregon
     plan: free
     envVars:
