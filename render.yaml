@@ -4,6 +4,7 @@ services:
     name: be-todo
     env: docker
     dockerfilePath: ./backend/Dockerfile
+    buildContext: ./backend
     plan: free
     region: oregon
     healthCheckPath: /api/health
@@ -28,6 +29,7 @@ services:
     name: fe-todo
     env: docker
     dockerfilePath: ./frontend/Dockerfile
+    buildContext: ./frontend
     plan: free
     region: oregon
     envVars:
