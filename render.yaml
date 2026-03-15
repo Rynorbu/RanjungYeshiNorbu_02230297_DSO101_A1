@@ -11,7 +11,6 @@ services:
     name: be-todo
     env: docker
     dockerfilePath: backend/Dockerfile
-    buildContext: ./
     region: oregon
     plan: free
     healthCheckPath: /api/health
@@ -39,23 +38,17 @@ services:
         value: 5000
       - key: NODE_ENV
         value: production
-    dependsOn:
-      - todo-db
 
   # Frontend Service
   - type: web
     name: fe-todo
     env: docker
     dockerfilePath: frontend/Dockerfile
-    buildContext: ./
     region: oregon
     plan: free
-    buildCommand: npm run build
     envVars:
       - key: REACT_APP_API_URL
         fromService:
           type: web
           name: be-todo
           property: host
-    dependsOn:
-      - be-todo
