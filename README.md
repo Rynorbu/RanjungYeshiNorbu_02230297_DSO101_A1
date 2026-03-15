@@ -397,7 +397,151 @@ services:
    - `be-todo` (Backend)
    - `fe-todo` (Frontend)
 2. Review the configuration
-3. Click **"Apply"**
+3. Click **"Deploy Blueprint"**
+
+#### 4.3 Wait for Deployment
+Render will automatically:
+1. **Create PostgreSQL Database** (2-3 minutes)
+2. **Build Backend Docker Image** (3-4 minutes)
+3. **Build Frontend Docker Image** (3-5 minutes)
+4. **Deploy all 3 services** (1-2 minutes)
+
+**Total deployment time: 10-15 minutes**
+
+Monitor the progress in the Render dashboard. Each service will show:
+- 🟡 Building
+- 🟢 Live (when complete)
+
+#### 4.4 Get Your Live URLs
+
+Once all services are live (green), Render shows your service URLs:
+
+```
+Frontend:  https://fe-todo.onrender.com
+Backend:   https://be-todo.onrender.com
+Database:  todo-db (internal only)
+```
+
+**Screenshot Required:** Dashboard showing all 3 services with "Live" status
+
+### Step 5: Test Deployed Application
+
+#### 5.1 Check Backend Health
+Open in browser:
+```
+https://be-todo.onrender.com/api/health
+```
+
+Expected response:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-03-15T...",
+  "database": "connected"
+}
+```
+
+✅ If you see this, backend and database are connected!
+
+**Screenshot Required:** Health check working
+
+#### 5.2 Test Frontend UI
+Open in browser:
+```
+https://fe-todo.onrender.com
+```
+
+You should see the Todo List application with:
+- Input field to add new todos
+- List area (empty on first deployment)
+- Responsive design
+
+**Screenshot Required:** Frontend page loaded
+
+#### 5.3 Test CRUD Operations
+
+Verify all functionality works:
+
+1. **CREATE - Add a Todo:**
+   - Type: "Test Deployment"
+   - Click "Add Todo"
+   - Should appear in list ✅
+
+2. **READ - Refresh Page:**
+   - Press Ctrl+F5 (hard refresh)
+   - Todo should still be there ✅
+   - Proves data persistence in database
+
+3. **UPDATE - Edit Todo:**
+   - Click pencil icon
+   - Change title to "Deployment Success"
+   - Click Save ✅
+
+4. **DELETE - Delete Todo:**
+   - Click trash icon
+   - Confirm deletion
+   - Todo disappears ✅
+
+**Screenshot Required:** CRUD operations in action
+
+### Step 6: Automated Redeployment (CI/CD Pipeline)
+
+Your Blueprint is configured to automatically redeploy on every Git push:
+
+**Make a change and push:**
+```bash
+# Example: Update frontend message
+git add .
+git commit -m "Update welcome message"
+git push origin main
+```
+
+**Render automatically:**
+1. Detects the new commit
+2. Rebuilds Docker images
+3. Redeploys services
+4. **Zero downtime** - old services stay running until new ones are ready
+
+Monitor deployment progress in Render Dashboard → Deploys tab
+
+**Screenshot Required:** Git push triggering automatic redeploy
+
+---
+
+## 📊 Deployment Comparison
+
+| Aspect | Local Docker | Part A (Hub) | Part B (Blueprint) |
+|--------|--------------|-------------|-------------------|
+| **Setup Time** | 5 min | 15-20 min | 20-25 min |
+| **Redeploy Method** | Manual | Manual push | Auto on Git push |
+| **Production Grade** | ❌ | ✅ | ✅✅ |
+| **CI/CD Pipeline** | ❌ | ❌ | ✅ |
+| **Scalability** | ❌ | Limited | Better |
+| **Best for** | Development | Quick demo | Production |
+
+---
+
+## 📋 Submission Checklist
+
+- [ ] **Part A - Docker Hub:**
+  - [ ] Backend image pushed to `yourusername/be-todo:studentid`
+  - [ ] Frontend image pushed to `yourusername/fe-todo:studentid`
+  - [ ] Screenshot of Docker Hub repositories
+
+- [ ] **Part B - Render Blueprint:**
+  - [ ] Code pushed to GitHub
+  - [ ] Blueprint created in Render
+  - [ ] All 3 services deployed and showing "Live" status
+  - [ ] Health check endpoint returning connected status
+  - [ ] Frontend UI loading
+  - [ ] CRUD operations all working
+  - [ ] Automatic redeploy working on Git push
+
+- [ ] **Documentation:**
+  - [ ] README.md updated with deployment URLs
+  - [ ] All required screenshots included
+  - [ ] Deployment steps documented
+  - [ ] Live URLs in README.md
 
 **Screenshot Required:** Blueprint review page
 
