@@ -1,10 +1,4 @@
 services:
-  # PostgreSQL Database
-  - type: pserv
-    name: todo-db
-    plan: free
-    region: oregon
-
   # Backend Service
   - type: web
     name: be-todo
@@ -14,11 +8,16 @@ services:
     plan: free
     healthCheckPath: /api/health
     envVars:
-      - key: DB_CONNECTION_STRING
-        fromService:
-          type: pserv
-          name: todo-db
-          property: connectionString
+      - key: DB_HOST
+        value: dpg-d6r7diruibrs739jv71g-a
+      - key: DB_USER
+        value: todo_database_c1um_user
+      - key: DB_PASSWORD
+        value: 87n2SIUx4PMc3858jVcDMAoQ1O01Yn8C
+      - key: DB_NAME
+        value: todo_database_c1um
+      - key: DB_PORT
+        value: 5432
       - key: PORT
         value: 5000
       - key: NODE_ENV
