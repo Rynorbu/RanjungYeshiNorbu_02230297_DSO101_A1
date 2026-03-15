@@ -19,6 +19,7 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'todo_db',
   port: process.env.DB_PORT || 5432,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
 // Test database connection and create table
