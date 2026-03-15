@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, Pencil, Trash2, Check, X, AlertCircle, ClipboardList } from 'lucide-react';
+import { Plus, Pencil, Trash2, Check, X, AlertCircle, ClipboardList, BarChart3 } from 'lucide-react';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -12,6 +12,12 @@ function App() {
   const [newTodo, setNewTodo] = useState({ title: '', description: '' });
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ title: '', description: '' });
+  const [showStats, setShowStats] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
+  const [filterType, setFilterType] = useState('all');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [pendingAction, setPendingAction] = useState(null);
 
   // Fetch all todos
   const fetchTodos = async () => {
@@ -39,6 +45,7 @@ function App() {
     try {
       await axios.post(`${API_URL}/api/todos`, newTodo);
       setNewTodo({ title: '', description: '' });
+      setShowDescription(false);
       fetchTodos();
       setError('');
     } catch (err) {
@@ -75,17 +82,32 @@ function App() {
   };
 
   // Delete todo
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this todo?')) {
+  const handleDelete = (id) => {
+    setConfirmMessage('Are you sure you want to delete this todo?');
+    setPendingAction(() => async () => {
       try {
         await axios.delete(`${API_URL}/api/todos/${id}`);
         fetchTodos();
         setError('');
+        setShowConfirmModal(false);
       } catch (err) {
         setError('Failed to delete todo');
         console.error('Error deleting todo:', err);
       }
+    });
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirm = () => {
+    if (pendingAction) {
+      pendingAction();
     }
+  };
+
+  const handleCancelConfirm = () => {
+    setShowConfirmModal(false);
+    setConfirmMessage('');
+    setPendingAction(null);
   };
 
   // Start editing
@@ -104,12 +126,100 @@ function App() {
     fetchTodos();
   }, []);
 
+  // Calculate stats
+  const totalTasks = todos.length;
+  const completedTasks = todos.filter(t => t.completed).length;
+  const pendingTasks = totalTasks - completedTasks;
+  const completionPercentage = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+
   return (
     <div className="App">
       <div className="container">
         <header className="app-header">
-          <h1>Todo List</h1>
-          <p className="subtitle">DSO101 - CI/CD Assignment</p>
+          <div className="header-top">
+            <div className="header-content">
+              <h1>ZenTask</h1>
+              <p className="subtitle">What's your plan for today?</p>
+            </div>
+            <div className="stats-button-container">
+              <button 
+                className="stats-button"
+                onClick={() => setShowStats(!showStats)}
+                title="View task statistics"
+                aria-label="View task statistics"
+              >
+                <BarChart3 size={20} />
+                <div className="stats-mini">
+                  <div className="stat-item">
+                    <span className="stat-label">Total</span>
+                    <span className="stat-value">{totalTasks}</span>
+                  </div>
+                  <div className="stat-divider"></div>
+                  <div className="stat-item">
+                    <span className="stat-label">Done</span>
+                    <span className="stat-value">{completedTasks}</span>
+                  </div>
+                </div>
+              </button>
+              
+              {showStats && (
+                <div className="stats-modal">
+                  <div className="stats-modal-content">
+                    <div className="stats-modal-header">
+                      <h3>Task Statistics</h3>
+                      <button 
+                        className="close-btn"
+                        onClick={() => setShowStats(false)}
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                    <div className="stats-grid">
+                      <div className="stat-card">
+                        <div className="stat-icon total-icon">
+                          <ClipboardList size={24} />
+                        </div>
+                        <div className="stat-info">
+                          <p className="stat-title">Total Tasks</p>
+                          <p className="stat-number">{totalTasks}</p>
+                        </div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-icon completed-icon">
+                          <Check size={24} />
+                        </div>
+                        <div className="stat-info">
+                          <p className="stat-title">Completed</p>
+                          <p className="stat-number">{completedTasks}</p>
+                        </div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-icon pending-icon">
+                          <AlertCircle size={24} />
+                        </div>
+                        <div className="stat-info">
+                          <p className="stat-title">Pending</p>
+                          <p className="stat-number">{pendingTasks}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="progress-section">
+                      <div className="progress-header">
+                        <span>Completion Progress</span>
+                        <span className="progress-percentage">{completionPercentage}%</span>
+                      </div>
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill" 
+                          style={{ width: `${completionPercentage}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </header>
 
         {error && (
@@ -129,17 +239,39 @@ function App() {
             onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
             className="input-field"
           />
-          <textarea
-            placeholder="Enter description (optional)"
-            value={newTodo.description}
-            onChange={(e) => setNewTodo({ ...newTodo, description: e.target.value })}
-            className="input-field textarea-field"
-            rows="3"
-          />
-          <button type="submit" className="btn btn-primary">
-            <Plus size={18} />
-            <span>Add Todo</span>
-          </button>
+          <div className="form-row">
+            <button
+              type="button"
+              className="dropdown-icon-btn"
+              onClick={() => setShowDescription(!showDescription)}
+              title="Toggle description"
+            >
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2"
+                className={`chevron-icon ${showDescription ? 'open' : ''}`}
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <button type="submit" className="btn btn-primary btn-add">
+              <Plus size={18} />
+              <span>Add Todo</span>
+            </button>
+          </div>
+          {showDescription && (
+            <textarea
+              placeholder="Enter description (optional)"
+              value={newTodo.description}
+              onChange={(e) => setNewTodo({ ...newTodo, description: e.target.value })}
+              className="input-field textarea-field"
+              rows="3"
+            />
+          )}
         </form>
 
         {/* Todos List */}
@@ -150,6 +282,33 @@ function App() {
               {todos.length} {todos.length === 1 ? 'item' : 'items'}
             </span>
           </div>
+
+          {/* Filter Tabs */}
+          {todos.length > 0 && (
+            <div className="filter-tabs">
+              <button
+                className={`filter-tab ${filterType === 'all' ? 'active' : ''}`}
+                onClick={() => setFilterType('all')}
+              >
+                <ClipboardList size={18} />
+                <span>All</span>
+              </button>
+              <button
+                className={`filter-tab ${filterType === 'active' ? 'active' : ''}`}
+                onClick={() => setFilterType('active')}
+              >
+                <AlertCircle size={18} />
+                <span>Active</span>
+              </button>
+              <button
+                className={`filter-tab ${filterType === 'completed' ? 'active' : ''}`}
+                onClick={() => setFilterType('completed')}
+              >
+                <Check size={18} />
+                <span>Completed</span>
+              </button>
+            </div>
+          )}
 
           {loading ? (
             <div className="loading">
@@ -163,8 +322,26 @@ function App() {
               <span>Create your first todo above!</span>
             </div>
           ) : (
-            <div className="todos-list">
-              {todos.map((todo) => (
+            <>
+              {todos.filter((todo) => {
+                if (filterType === 'active') return !todo.completed;
+                if (filterType === 'completed') return todo.completed;
+                return true;
+              }).length === 0 ? (
+                <div className="empty-state">
+                  <ClipboardList size={48} />
+                  <p>No {filterType} tasks</p>
+                  <span>All caught up!</span>
+                </div>
+              ) : (
+                <div className="todos-list">
+                  {todos
+                    .filter((todo) => {
+                      if (filterType === 'active') return !todo.completed;
+                      if (filterType === 'completed') return todo.completed;
+                      return true;
+                    })
+                    .map((todo) => (
                 <div
                   key={todo.id}
                   className={`todo-item ${todo.completed ? 'completed' : ''}`}
@@ -253,8 +430,37 @@ function App() {
                 </div>
               ))}
             </div>
+              )}
+            </>
           )}
         </div>
+
+        {/* Confirmation Modal */}
+        {showConfirmModal && (
+          <div className="modal-overlay">
+            <div className="confirmation-modal">
+              <div className="modal-icon warning-icon">
+                <AlertCircle size={32} />
+              </div>
+              <h3 className="modal-title">Confirm Action</h3>
+              <p className="modal-message">{confirmMessage}</p>
+              <div className="modal-actions">
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleCancelConfirm}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={handleConfirm}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
