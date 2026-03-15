@@ -4,7 +4,7 @@ services:
     name: todo-db
     plan: free
     region: oregon
-    ipAllowList: []
+    database: todo_db
 
   # Backend Service
   - type: web
@@ -15,25 +15,11 @@ services:
     plan: free
     healthCheckPath: /api/health
     envVars:
-      - key: DB_HOST
+      - key: DB_CONNECTION_STRING
         fromService:
           type: pserv
           name: todo-db
-          property: host
-      - key: DB_USER
-        value: todo_user
-      - key: DB_PASSWORD
-        fromService:
-          type: pserv
-          name: todo-db
-          property: password
-      - key: DB_NAME
-        fromService:
-          type: pserv
-          name: todo-db
-          property: database
-      - key: DB_PORT
-        value: 5432
+          property: connectionString
       - key: PORT
         value: 5000
       - key: NODE_ENV
