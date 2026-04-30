@@ -9,13 +9,13 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: DB_HOST
-        value: dpg-d6r7diruibrs739jv71g-a.singapore-postgres.render.com
+        value: dpg-d7kms9u8bjmc73db1aug-a.singapore-postgres.render.com
       - key: DB_USER
-        value: todo_database_c1um_user
+        value: taskflow_db_p3b4_user
       - key: DB_PASSWORD
-        value: 87n2SIUx4PMc3858jVcDMAoQ1O01Yn8C
+        value: je8kExs4d7RtmAOU3sKZX8ikUm63nMos
       - key: DB_NAME
-        value: todo_database_c1um
+        value: taskflow_db_p3b4
       - key: DB_PORT
         value: 5432
       - key: PORT
