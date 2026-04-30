@@ -4,14 +4,14 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package files from backend directory (Render Blueprint context is repo root)
+COPY backend/package*.json ./
 
 # Install dependencies
 RUN npm install --production
 
-# Copy application code
-COPY . .
+# Copy application code from backend directory
+COPY backend/ .
 
 # Expose port
 EXPOSE 5000

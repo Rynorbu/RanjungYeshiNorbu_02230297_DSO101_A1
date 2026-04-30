@@ -7,14 +7,14 @@ WORKDIR /app
 ARG REACT_APP_API_URL=http://localhost:5000
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 
-# Copy package files
-COPY package*.json ./
+# Copy package files from frontend directory (Render Blueprint context is repo root)
+COPY frontend/package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy app source
-COPY . .
+# Copy app source from frontend directory
+COPY frontend/ .
 
 # Build the app
 RUN npm run build
@@ -25,8 +25,8 @@ FROM nginx:alpine
 # Copy built files from build stage
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy custom nginx configuration from frontend directory
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80
