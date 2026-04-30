@@ -1,4 +1,4 @@
-# 🎯 ZenTask - Todo Application
+# Task Flow - Todo Application
 ## CI/CD Deployment with Docker & Render
 
 **Student Name:** Ranjung Yeshi Norbu  

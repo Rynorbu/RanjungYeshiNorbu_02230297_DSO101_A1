@@ -138,7 +138,7 @@ function App() {
         <header className="app-header">
           <div className="header-top">
             <div className="header-content">
-              <h1>ZenTask</h1>
+              <h1>TaskFlow</h1>
               <p className="subtitle">What's your plan for today?</p>
             </div>
             <div className="stats-button-container">
